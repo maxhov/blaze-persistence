@@ -246,11 +246,11 @@ public class GraphQLEntityViewSupport {
             objectRoot = elementRoot + "/" + pageElementObjectName;
         }
         String typeName = getElementTypeName(dataFetchingEnvironment, objectRoot);
-        Class<?> entityViewClass = typeNameToViewType.get(typeName).getJavaType();
+        ManagedViewType<?> entityViewClass = typeNameToViewType.get(typeName);
         if (entityViewClass == null) {
             throw new IllegalArgumentException("No entity view type is registered for the name: " + typeName);
         }
-        return createPaginatedSetting((Class<T>) entityViewClass, dataFetchingEnvironment, elementRoot);
+        return createPaginatedSetting((Class<T>) entityViewClass.getJavaType(), dataFetchingEnvironment, elementRoot);
     }
 
     /**
@@ -276,11 +276,11 @@ public class GraphQLEntityViewSupport {
             objectRoot = elementRoot + "/" + pageElementObjectName;
         }
         String typeName = getElementTypeName(dataFetchingEnvironment, objectRoot);
-        Class<?> entityViewClass = typeNameToViewType.get(typeName).getJavaType();
+        ManagedViewType<?> entityViewClass = typeNameToViewType.get(typeName);
         if (entityViewClass == null) {
             throw new IllegalArgumentException("No entity view type is registered for the name: " + typeName);
         }
-        return createPaginatedSetting((Class<T>) entityViewClass, dataFetchingEnvironment, elementRoot, extractKeysetPage(first, last, beforeCursor, afterCursor), first, last, offset);
+        return createPaginatedSetting((Class<T>) entityViewClass.getJavaType(), dataFetchingEnvironment, elementRoot, extractKeysetPage(first, last, beforeCursor, afterCursor), first, last, offset);
     }
 
     /**
@@ -383,11 +383,11 @@ public class GraphQLEntityViewSupport {
      */
     public <T> EntityViewSetting<T, CriteriaBuilder<T>> createSetting(DataFetchingEnvironment dataFetchingEnvironment, String elementRoot) {
         String typeName = getElementTypeName(dataFetchingEnvironment, elementRoot);
-        Class<?> entityViewClass = typeNameToViewType.get(typeName).getJavaType();
+        ManagedViewType<?> entityViewClass = typeNameToViewType.get(typeName);
         if (entityViewClass == null) {
             throw new IllegalArgumentException("No entity view type is registered for the name: " + typeName);
         }
-        return createSetting((Class<T>) entityViewClass, dataFetchingEnvironment, elementRoot);
+        return createSetting((Class<T>) entityViewClass.getJavaType(), dataFetchingEnvironment, elementRoot);
     }
 
     public String getElementTypeName(DataFetchingEnvironment dataFetchingEnvironment, String elementRoot) {
@@ -710,7 +710,11 @@ public class GraphQLEntityViewSupport {
      * @return the entity view class or <code>null</code>
      */
     public Class<?> getEntityViewClass(String typeName) {
-        return typeNameToViewType.get(typeName).getJavaType();
+        ManagedViewType<?> entityViewClass = typeNameToViewType.get(typeName);
+        if (entityViewClass == null) {
+            throw new IllegalArgumentException("No entity view type is registered for the name: " + typeName);
+        }
+        return entityViewClass.getJavaType();
     }
 
     /**
